@@ -12,7 +12,7 @@ describe('ProfitService', () => {
     { price: 124.57, time: new Date(2020, 1, 2, 0, 13, 4) },
     { price: 124.58, time: new Date(2020, 1, 2, 0, 13, 5) },
     { price: 124.59, time: new Date(2020, 1, 2, 0, 13, 6) },
-    { price: 124.6, time: new Date(2020, 1, 2, 0, 13, 7) }
+    { price: 124.6, time: new Date(2020, 1, 2, 0, 13, 7) },
   ];
 
   let noProfitTestData: Array<StockPrice> = [
@@ -23,7 +23,7 @@ describe('ProfitService', () => {
     { price: 124.48, time: new Date(2020, 1, 2, 0, 13, 4) },
     { price: 124.47, time: new Date(2020, 1, 2, 0, 13, 5) },
     { price: 124.46, time: new Date(2020, 1, 2, 0, 13, 6) },
-    { price: 124.45, time: new Date(2020, 1, 2, 0, 13, 7) }
+    { price: 124.45, time: new Date(2020, 1, 2, 0, 13, 7) },
   ];
 
   let maxProfitTestCases = [
@@ -53,7 +53,11 @@ describe('ProfitService', () => {
   let noProfitTestCases = [
     ['with single element', noProfitTestData[0].time, noProfitTestData[0].time],
     ['with same prices', noProfitTestData[1].time, noProfitTestData[4].time],
-    ['with declining prices', noProfitTestData[0].time, noProfitTestData[7].time],
+    [
+      'with declining prices',
+      noProfitTestData[0].time,
+      noProfitTestData[7].time,
+    ],
   ];
 
   describe('findOptimalResult', () => {
@@ -86,7 +90,9 @@ describe('ProfitService', () => {
           endTime,
         );
 
-        expect(result).toBeNull();
+        expect(result.profit).toBe(0);
+        expect(result.buyTime).toBeNull();
+        expect(result.sellTime).toBeNull();
       },
     );
   });

@@ -10,8 +10,7 @@ export class ProfitService {
     end: Date,
   ): MaxProfit {
     let buyPoint: StockPrice = null;
-    let sellPoint: StockPrice = null;
-    let profits: Array<MaxProfit> = [];
+    let maxProfit = { buyTime: null, sellTime: null, profit: 0 };
 
     for (const price of historicalPrices) {
       if (isBefore(price.time, start)) {
@@ -27,42 +26,20 @@ export class ProfitService {
         continue;
       }
 
-      if (buyPoint.price > price.price) {
-        if (sellPoint != null) {
-          profits.push({
-            buyTime: buyPoint.time,
-            sellTime: sellPoint.time,
-            profit: sellPoint.price - buyPoint.price,
-          });
-          sellPoint = null;
-        }
+      if (price.price < buyPoint.price) {
         buyPoint = price;
-        continue;
       }
-
-      if (
-        price.price > buyPoint.price &&
-        (sellPoint == null || sellPoint.price < price.price)
-      ) {
-        sellPoint = price;
+      if (price.price > buyPoint.price) {
+        if (price.price - buyPoint.price > maxProfit.profit) {
+          maxProfit = {
+            buyTime: buyPoint.time,
+            sellTime: price.time,
+            profit: price.price - buyPoint.price,
+          };
+        }
       }
     }
-    if (buyPoint != null && sellPoint != null) {
-      profits.push({
-        buyTime: buyPoint.time,
-        sellTime: sellPoint.time,
-        profit: sellPoint.price - buyPoint.price,
-      });
-    }
 
-    return profits.reduce((acc, cur) => {
-      if (acc == null) {
-        return cur;
-      }
-      if (acc.profit < cur.profit) {
-        return cur;
-      }
-      return acc;
-    }, null);
+    return maxProfit;
   }
 }
