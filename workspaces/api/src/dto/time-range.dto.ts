@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsNotEmpty, Validate } from 'class-validator';
-import { EndLaterThanStartRule } from '../validator/end-later-than-start-rule';
+import { isAfterThan } from '../validator/is-after-than';
 
 export class TimeRangeDTO {
   @IsNotEmpty()
@@ -9,6 +9,6 @@ export class TimeRangeDTO {
 
   @IsNotEmpty()
   @Type(() => Date)
-  @Validate(EndLaterThanStartRule)
+  @isAfterThan("startTime")
   readonly endTime: Date;
 }
