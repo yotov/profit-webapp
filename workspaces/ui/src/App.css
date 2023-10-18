@@ -9,3 +9,8 @@
   display: block;
   margin: 16px;
 }
+
+.profit-form .field-error {
+  color: red;
+}
+

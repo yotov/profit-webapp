@@ -9,11 +9,20 @@ type RequestState =
   | { status: 'idle' }
   | { status: 'loading' }
   | { status: 'success', data: any }
-  | { status: 'error', error: string };
+  | { status: 'error', error: any };
 
 type FormState = {
   startTime: Date,
   endTime: Date
+}
+
+function clean(obj: any) {
+  for (const propName in obj) {
+    if (obj[propName] === null || obj[propName] === undefined) {
+      delete obj[propName];
+    }
+  }
+  return obj
 }
 
 function App() {
@@ -28,7 +37,7 @@ function App() {
     setRequestState({ status: 'loading' });
 
     try {
-      const params = new URLSearchParams(formState);
+      const params = new URLSearchParams(clean(formState));
       const response = await fetch(`/api/profit?${params}`, {
         method: 'GET',
         headers: {
@@ -40,7 +49,7 @@ function App() {
       if (response.ok) {
         setRequestState({ status: 'success', data: result });
       } else {
-        setRequestState({ status: 'error', error: result.message });
+        setRequestState({ status: 'error', error: result });
       }
 
     } catch (err) {
@@ -55,19 +64,21 @@ function App() {
         <label>
           <span>Start time:</span>
           <DateTimePicker onChange={newValue => setFormState({ startTime: newValue, endTime: formState.endTime })} format="y-MM-dd HH:mm:ss" value={formState.startTime} />
+          {requestState.status == "error" && requestState.error.fields.startTime && <div className="field-error">{requestState.error.fields.startTime}</div>}
         </label>
         <label>
           <span>End time:</span>
           <DateTimePicker onChange={newValue => setFormState({ startTime: formState.startTime, endTime: newValue })} format="y-MM-dd HH:mm:ss" value={formState.endTime} />
+          {requestState.status == "error" && requestState.error.fields.endTime && <div className="field-error">{requestState.error.fields.endTime}</div>}
         </label>
         <div>
           <button>
             Find max profit
           </button>
         </div>
+        {requestState.status == "success" && <div>You will realize max profit if you buy at {requestState.data.buyTime} and sell at {requestState.data.sellTime}. The profit will be {requestState.data.profit}</div>}
+        {requestState.status == "error" && !requestState.error.fields && <div className="form-error">{requestState.error.message}</div>}
       </form>
-      {requestState.status == "success" && <div>You will realize max profit if you buy at {requestState.data.buyTime} and sell at {requestState.data.sellTime}. The profit will be {requestState.data.profit}</div>}
-      {requestState.status == "error" && <div>{requestState.error}</div>}
     </>
   )
 }
