@@ -13,22 +13,5 @@
       "test": "echo \"todo\""
     },
     "author": "ilian@yotov.eu",
-    "license": "UNLICENSED",
-    "jest": {
-      "moduleFileExtensions": [
-        "js",
-        "json",
-        "ts"
-      ],
-      "rootDir": "workspaces",
-      "testRegex": ".*\\.spec\\.ts$",
-      "transform": {
-        "^.+\\.(t|j)s$": "ts-jest"
-      },
-      "collectCoverageFrom": [
-        "**/*.(t|j)s"
-      ],
-      "coverageDirectory": "../coverage",
-      "testEnvironment": "node"
-    }
+    "license": "UNLICENSED"
   }

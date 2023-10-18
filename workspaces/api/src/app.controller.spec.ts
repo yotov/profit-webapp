@@ -1,7 +1,8 @@
 import * as request from 'supertest';
 import { Test } from '@nestjs/testing';
 import { AppModule } from './app.module';
-import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
+import { globalPipes } from './main.config';
 
 describe('AppController', () => {
   let app: INestApplication;
@@ -12,7 +13,7 @@ describe('AppController', () => {
     }).compile();
 
     app = moduleRef.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ transform: true })); // @TODO: Find a better way to handle duplication
+    app.useGlobalPipes(globalPipes);
     await app.init();
   });
 
@@ -23,12 +24,10 @@ describe('AppController', () => {
         .get('/profit')
         .expect(400)
         .expect(({ body }) => {
-          expect(body.message).toEqual(
-            expect.arrayContaining(['startTime should not be empty']),
+          expect(body.fields.startTime).toEqual(
+            'startTime should not be empty',
           );
-          expect(body.message).toEqual(
-            expect.arrayContaining(['endTime should not be empty']),
-          );
+          expect(body.fields.endTime).toEqual('endTime should not be empty');
         });
     });
 
@@ -41,8 +40,8 @@ describe('AppController', () => {
         })
         .expect(400)
         .expect(({ body }) => {
-          expect(body.message).toEqual(
-            expect.arrayContaining(['endTime should be later than startTime']),
+          expect(body.fields.endTime).toEqual(
+            'endTime should be later than startTime',
           );
         });
     });
@@ -57,8 +56,8 @@ describe('AppController', () => {
         })
         .expect(400)
         .expect(({ body }) => {
-          expect(body.message).toEqual(
-            'startTime is outside available data range.', // @TODO: Unify response of errors
+          expect(body.fields.startTime).toEqual(
+            'startTime is outside available data range.',
           );
         });
     });
@@ -73,7 +72,7 @@ describe('AppController', () => {
         })
         .expect(400)
         .expect(({ body }) => {
-          expect(body.message).toEqual(
+          expect(body.fields.endTime).toEqual(
             'endTime is outside available data range.',
           );
         });
@@ -89,7 +88,6 @@ describe('AppController', () => {
         })
         .expect(400)
         .expect(({ body }) => {
-          console.log(body);
           expect(body.message).toEqual('No profit for selected time range.');
         });
     });

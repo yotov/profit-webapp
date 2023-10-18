@@ -9,6 +9,6 @@ export class TimeRangeDTO {
 
   @IsNotEmpty()
   @Type(() => Date)
-  @isAfterThan("startTime")
+  @isAfterThan('startTime')
   readonly endTime: Date;
 }

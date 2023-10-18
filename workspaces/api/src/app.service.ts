@@ -24,6 +24,9 @@ export class AppService {
     if (startTime && isBefore(startTime, historicalData[0].time)) {
       throw new BadRequestException({
         message: 'startTime is outside available data range.',
+        fields: {
+          startTime: 'startTime is outside available data range.',
+        },
         context: {
           range: {
             start: historicalData.at(0).time,
@@ -36,6 +39,9 @@ export class AppService {
     if (endTime && isAfter(endTime, historicalData.at(-1).time)) {
       throw new BadRequestException({
         message: 'endTime is outside available data range.',
+        fields: {
+          endTime: 'endTime is outside available data range.',
+        },
         context: {
           range: {
             start: historicalData.at(0).time,
