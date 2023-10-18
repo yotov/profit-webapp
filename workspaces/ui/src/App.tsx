@@ -1,23 +1,73 @@
 import { useState } from 'react'
 import './App.css'
+import DateTimePicker from 'react-datetime-picker';
+import 'react-datetime-picker/dist/DateTimePicker.css';
+import 'react-calendar/dist/Calendar.css';
+import 'react-clock/dist/Clock.css';
+
+type RequestState =
+  | { status: 'idle' }
+  | { status: 'loading' }
+  | { status: 'success', data: any }
+  | { status: 'error', error: string };
+
+type FormState = {
+  startTime: Date,
+  endTime: Date
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [requestState, setRequestState] = useState<RequestState>({ status: 'idle' });
+  const [formState, setFormState] = useState<FormState>({ startTime: new Date(), endTime: new Date() });
+
+  const handleSubmit = async (event: any) => {
+    event.preventDefault();
+    if (requestState.status === "loading") {
+      return;
+    }
+    setRequestState({ status: 'loading' });
+
+    try {
+      const params = new URLSearchParams(formState);
+      const response = await fetch(`/api/profit?${params}`, {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        setRequestState({ status: 'success', data: result });
+      } else {
+        setRequestState({ status: 'error', error: result.message });
+      }
+
+    } catch (err) {
+      setRequestState({ status: 'error', error: "Please try again later." });
+    }
+  };
 
   return (
     <>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <h1>Profit</h1>
+      <form className="profit-form" onSubmit={handleSubmit}>
+        <label>
+          <span>Start time:</span>
+          <DateTimePicker onChange={newValue => setFormState({ startTime: newValue, endTime: formState.endTime })} format="y-MM-dd HH:mm:ss" value={formState.startTime} />
+        </label>
+        <label>
+          <span>End time:</span>
+          <DateTimePicker onChange={newValue => setFormState({ startTime: formState.startTime, endTime: newValue })} format="y-MM-dd HH:mm:ss" value={formState.endTime} />
+        </label>
+        <div>
+          <button>
+            Find max profit
+          </button>
+        </div>
+      </form>
+      {requestState.status == "success" && <div>You will realize max profit if you buy at {requestState.data.buyTime} and sell at {requestState.data.sellTime}. The profit will be {requestState.data.profit}</div>}
+      {requestState.status == "error" && <div>{requestState.error}</div>}
     </>
   )
 }
