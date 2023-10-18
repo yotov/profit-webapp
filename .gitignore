@@ -1,6 +1,8 @@
 # compiled output
 /dist
+/workspaces/**/dist
 /node_modules
+/workspaces/**/node_modules
 
 # Logs
 logs
