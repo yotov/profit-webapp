@@ -1,22 +1,7 @@
 import { useState } from 'react'
 import DateTimePicker from 'react-datetime-picker';
 import Loader from '../components/Loader';
-
-type Error = {
-    message: string,
-    fields?: Record<string, string>,
-}
-
-type RequestState =
-    | { status: 'idle' }
-    | { status: 'loading' }
-    | { status: 'success', data: any }
-    | { status: 'error', error: Error };
-
-type FormState = {
-    startTime: string | undefined,
-    endTime: string | undefined
-}
+import FormField from './FormField';
 
 function clean(obj: any) {
     for (const propName in obj) {
@@ -26,7 +11,6 @@ function clean(obj: any) {
     }
     return obj
 }
-
 
 const Form = () => {
     const [requestState, setRequestState] = useState<RequestState>({ status: 'idle' });
@@ -64,16 +48,12 @@ const Form = () => {
 
     return <form className={"form " + (requestState.status === "loading" ? "form-loading" : "") + (requestState.status == "error" && !requestState.error.fields ? "form-has-error" : '')} onSubmit={handleSubmit}>
         {requestState.status == "error" && !requestState.error.fields && <div className="form-error">{requestState.error.message}</div>}
-        <label className={'field ' + (requestState.status == "error" && requestState.error.fields?.startTime ? 'field-has-error' : '')}>
-            <div className='field-label'>Start time:</div>
-            <DateTimePicker autoFocus onChange={newValue => setFormState({ startTime: newValue?.toISOString(), endTime: formState.endTime })} format="y-MM-dd HH:mm:ss" value={formState.startTime} />
-            {requestState.status == "error" && requestState.error.fields?.startTime && <div className="field-error">{requestState.error.fields.startTime}</div>}
-        </label>
-        <label className={'field ' + (requestState.status == "error" && requestState.error.fields?.endTime ? 'field-has-error' : '')}>
-            <div className='field-label'>End time:</div>
-            <DateTimePicker onChange={newValue => setFormState({ startTime: formState.startTime, endTime: newValue?.toISOString() })} format="y-MM-dd HH:mm:ss" value={formState.endTime} />
-            {requestState.status == "error" && requestState.error.fields?.endTime && <div className="field-error">{requestState.error.fields.endTime}</div>}
-        </label>
+        <FormField id="startDate" label="Start date:" requestState={requestState}>
+            <DateTimePicker autoFocus onChange={newValue => setFormState({ ...formState, startTime: newValue?.toISOString() })} format="y-MM-dd HH:mm:ss" value={formState.startTime} />
+        </FormField>
+        <FormField id="endDate" label="End date:" requestState={requestState}>
+            <DateTimePicker onChange={newValue => setFormState({ ...formState, endTime: newValue?.toISOString() })} format="y-MM-dd HH:mm:ss" value={formState.endTime} />
+        </FormField>
         <div>
             <button type="submit">
                 Find max profit
