@@ -40,12 +40,16 @@
   }
 }
 
+.form .field-input,
 .form .react-datetime-picker__wrapper {
   background-color: white;
   padding: 8px;
-  border-color: #ddd;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  outline: 0;
+  height: 40px;
   font-family: 'Courier New', Courier, monospace;
-  width: 280px;
+  width: 260px;
   font-size: 14px;
 
   & .react-datetime-picker__button svg {
@@ -53,6 +57,19 @@
     width: 16px;
     height: 16px;
   }
+
+  &:focus {
+    border-color: #32a1ce;
+  }
+}
+
+.form .field-input {
+  padding: 8px 16px;
+}
+
+.react-datetime-picker--open .react-datetime-picker__wrapper
+{
+  border-color: #32a1ce;
 }
 
 .form button[type=submit] {

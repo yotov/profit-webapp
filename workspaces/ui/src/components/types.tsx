@@ -11,5 +11,6 @@ type RequestState =
 
 type FormState = {
     startTime: string | undefined,
-    endTime: string | undefined
+    endTime: string | undefined,
+    investAmount?: number
 }
