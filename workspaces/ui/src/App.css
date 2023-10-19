@@ -8,6 +8,16 @@
 .form {
   position: relative;
   margin: 2rem;
+
+  & .form-error {
+    color: red;
+    font-size: 0.75rem;
+    height: 1rem;
+    position: absolute; 
+    top: -1.5rem;
+    left: 0;
+    right: 0;
+  }
 }
 
 .form .field {
@@ -25,7 +35,7 @@
   & .field-error {
     color: red;
     font-size: 0.75rem;
-    height: 16px;
+    height: 1rem;
     padding: 2px 0;
   }
 }
