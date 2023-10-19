@@ -1,14 +1,14 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { AppService } from './app.service';
 import { MaxProfit } from './profit.types';
-import { TimeRangeDTO } from './dto/time-range.dto';
+import { FindProfitDTO } from './dto/find-profit.dto';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('/profit')
-  getMaxProfit(@Query() timeRange: TimeRangeDTO, @Query('investAmount') investAmount: number): MaxProfit {
-    return this.appService.getMaxProfit(timeRange.startTime, timeRange.endTime, investAmount);
+  getMaxProfit(@Query() findProfit: FindProfitDTO): MaxProfit {
+    return this.appService.getMaxProfit(findProfit.startTime, findProfit.endTime, findProfit.investAmount);
   }
 }

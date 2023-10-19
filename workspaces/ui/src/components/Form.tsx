@@ -12,6 +12,12 @@ function clean(obj: any) {
     return obj
 }
 
+function parseNumber(value: string): number | undefined
+{
+    const num = parseFloat(value);
+    return isNaN(num) ? undefined : num;
+}
+
 const Form = () => {
     const [requestState, setRequestState] = useState<RequestState>({ status: 'idle' });
     const [formState, setFormState] = useState<FormState>({ startTime: new Date(2023, 9, 19, 10, 58, 3).toISOString(), endTime: new Date(2023, 9, 19, 10, 58, 4).toISOString() });
@@ -55,7 +61,7 @@ const Form = () => {
             <DateTimePicker onChange={newValue => setFormState({ ...formState, endTime: newValue?.toISOString() })} format="y-MM-dd HH:mm:ss" value={formState.endTime} />
         </FormField>
         <FormField id="investAmount" label="Invest amount" requestState={requestState} optional>
-            <input className="field-input" type="number" onChange={e => setFormState({ ...formState, investAmount: parseFloat(e.target.value) })} value={formState.investAmount} />
+            <input className="field-input" type="number" onChange={e => setFormState({ ...formState, investAmount: parseNumber(e.target.value) })} value={formState.investAmount ?? undefined} />
         </FormField>
         <div>
             <button type="submit">
