@@ -48,10 +48,10 @@ const Form = () => {
 
     return <form className={"form " + (requestState.status === "loading" ? "form-loading" : "") + (requestState.status == "error" && !requestState.error.fields ? "form-has-error" : '')} onSubmit={handleSubmit}>
         {requestState.status == "error" && !requestState.error.fields && <div className="form-error">{requestState.error.message}</div>}
-        <FormField id="startDate" label="Start date" requestState={requestState}>
+        <FormField id="startTime" label="Start date" requestState={requestState}>
             <DateTimePicker autoFocus onChange={newValue => setFormState({ ...formState, startTime: newValue?.toISOString() })} format="y-MM-dd HH:mm:ss" value={formState.startTime} />
         </FormField>
-        <FormField id="endDate" label="End date" requestState={requestState}>
+        <FormField id="endTime" label="End date" requestState={requestState}>
             <DateTimePicker onChange={newValue => setFormState({ ...formState, endTime: newValue?.toISOString() })} format="y-MM-dd HH:mm:ss" value={formState.endTime} />
         </FormField>
         <FormField id="investAmount" label="Invest amount" requestState={requestState} optional>
