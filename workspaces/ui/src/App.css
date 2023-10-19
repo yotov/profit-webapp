@@ -1,16 +1,75 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  width: 100%;
+  min-height: 100%;
+  background: linear-gradient(90deg, #F8FBF2 0%, rgba(243, 248, 255, 1) 100%);
   text-align: center;
 }
 
-.profit-form label {
+.form {
+  position: relative;
+  margin: 2rem;
+}
+
+.form .field {
   display: block;
-  margin: 16px;
+  padding-bottom: 32px;
+
+  &.field-has-error {
+    padding-bottom: 12px;
+
+    & .react-datetime-picker__wrapper {
+      border-color: red;
+    }
+  }
+
+  & .field-error {
+    color: red;
+    font-size: 0.75rem;
+    height: 16px;
+    padding: 2px 0;
+  }
 }
 
-.profit-form .field-error {
-  color: red;
+.form .react-datetime-picker__wrapper {
+  background-color: white;
+  padding: 8px;
+  border-color: #ddd;
+  font-family: 'Courier New', Courier, monospace;
+  width: 280px;
+  font-size: 14px;
+
+  & .react-datetime-picker__button svg {
+    stroke: #666;
+    width: 16px;
+    height: 16px;
+  }
 }
 
+.form button[type=submit] {
+  background-color: #9dc53b;
+  color: white;
+  font-weight: normal;
+  outline: 0;
+  border: 0;
+  position: relative;
+
+  &:hover {
+    background-color: #f2951f;
+    outline: 0;
+    border: 0;
+  }
+
+  &:active {
+    background-color: #db800d;
+    outline: 0;
+    border: 0;
+  }
+
+  &:focus {
+    outline: 1px solid #32a1ce;
+  }
+
+  .form-loading & {
+    color: transparent;
+  }
+}
