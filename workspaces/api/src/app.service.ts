@@ -15,7 +15,7 @@ export class AppService {
     private readonly profitService: ProfitService,
   ) {}
 
-  getMaxProfit(startTime: Date, endTime: Date): MaxProfit {
+  getMaxProfit(startTime: Date, endTime: Date, investAmount?: number): MaxProfit {
     const historicalData = this.priceRepository.getPrices();
     if (historicalData.length == 0) {
       throw new InternalServerErrorException({ message: 'No data available' });
@@ -55,6 +55,7 @@ export class AppService {
       historicalData,
       startTime,
       endTime,
+      investAmount
     );
 
     if (maxProfit.profit == 0) {

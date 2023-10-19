@@ -8,33 +8,40 @@ export class ProfitService {
     historicalPrices: Array<StockPrice>,
     start: Date,
     end: Date,
+    investAmount?: number
   ): MaxProfit {
     let buyPoint: StockPrice = null;
-    let maxProfit = { buyTime: null, sellTime: null, profit: 0 };
+    let maxProfit: MaxProfit = { buyTime: null, sellTime: null, profit: 0, stocksToBuy: 0 };
 
-    for (const price of historicalPrices) {
-      if (isBefore(price.time, start)) {
+    for (const priceAtTime of historicalPrices) {
+      if (isBefore(priceAtTime.time, start)) {
         continue;
       }
 
-      if (isAfter(price.time, end)) {
+      if (isAfter(priceAtTime.time, end)) {
         continue;
       }
 
       if (buyPoint == null) {
-        buyPoint = price;
+        if(investAmount == null || investAmount > priceAtTime.price) {
+          buyPoint = priceAtTime;
+        }
         continue;
       }
 
-      if (price.price < buyPoint.price) {
-        buyPoint = price;
+      if (priceAtTime.price < buyPoint.price) {
+        buyPoint = priceAtTime;
       }
-      if (price.price > buyPoint.price) {
-        if (price.price - buyPoint.price > maxProfit.profit) {
+
+      if (priceAtTime.price > buyPoint.price) {
+        const stocksToBuy = investAmount != null ? Math.floor(investAmount / buyPoint.price) : 1;
+        const currentProfit = (priceAtTime.price - buyPoint.price) * stocksToBuy;
+        if (currentProfit > maxProfit.profit) {
           maxProfit = {
             buyTime: buyPoint.time,
-            sellTime: price.time,
-            profit: price.price - buyPoint.price,
+            sellTime: priceAtTime.time,
+            stocksToBuy: stocksToBuy,
+            profit: currentProfit,
           };
         }
       }

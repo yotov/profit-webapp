@@ -7,4 +7,5 @@ export type MaxProfit = {
   buyTime: Date;
   sellTime: Date;
   profit: number;
+  stocksToBuy: number;
 };

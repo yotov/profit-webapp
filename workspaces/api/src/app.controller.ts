@@ -8,7 +8,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('/profit')
-  getMaxProfit(@Query() timeRange: TimeRangeDTO): MaxProfit {
-    return this.appService.getMaxProfit(timeRange.startTime, timeRange.endTime);
+  getMaxProfit(@Query() timeRange: TimeRangeDTO, @Query('investAmount') investAmount: number): MaxProfit {
+    return this.appService.getMaxProfit(timeRange.startTime, timeRange.endTime, investAmount);
   }
 }
