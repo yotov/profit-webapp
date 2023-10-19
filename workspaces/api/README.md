@@ -58,16 +58,12 @@ $ yarn run test:e2e
 $ yarn run test:cov
 ```
 
-## Support
+## Sample data
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+# generate-sample-data help
+yarn command-nest generate-price-history --help
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+# generate-sample-data usage
+yarn command-nest generate-price-history -c 10000 -s 132 -d "2023-10-19 20:00:00"
+```

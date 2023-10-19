@@ -1,5 +1,6 @@
 import { Command, CommandRunner, Option } from 'nest-commander';
 import { writeFile } from 'node:fs/promises';
+import { parse } from 'date-fns';
 
 interface CommandOptions {
   startTime?: Date;
@@ -59,10 +60,10 @@ export class PriceHistoryCommandModule extends CommandRunner {
   }
 
   @Option({
-    flags: '-d, --start-date [date]',
-    description: 'The starting date of sample data ( in "yyyy-MM-dd" format )',
+    flags: '-d, --start-time [time]',
+    description: 'The starting time of sample data ( in "yyyy-MM-dd HH:mm:ss" format )',
   })
-  parseStartDate(val: string): Date {
-    return new Date(val); // @TODO: use date-fns
+  parseStartTime(val: string): Date {
+    return parse(val, "yyyy-MM-dd HH:mm:ss", new Date());
   }
 }
