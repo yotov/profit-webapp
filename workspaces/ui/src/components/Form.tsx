@@ -2,6 +2,7 @@ import { useState } from 'react'
 import DateTimePicker from 'react-datetime-picker';
 import Loader from '../components/Loader';
 import FormField from './FormField';
+import Result from './Result';
 
 function clean(obj: any) {
     for (const propName in obj) {
@@ -69,7 +70,7 @@ const Form = () => {
                 {requestState.status === "loading" && <Loader />}
             </button>
         </div>
-        {requestState.status == "success" && <div>You will realize max profit if you buy at {requestState.data.buyTime} and sell at {requestState.data.sellTime}. The profit will be {requestState.data.profit}</div>}
+        {requestState.status == "success" && <Result requestState={requestState} />}
     </form>
 }
 

@@ -24,7 +24,7 @@ export class ProfitService {
       }
 
       if (buyPoint == null) {
-        if(investAmount == null || investAmount > priceAtTime.price) {
+        if (investAmount == null || investAmount > priceAtTime.price) {
           buyPoint = priceAtTime;
         }
         continue;
@@ -36,13 +36,14 @@ export class ProfitService {
 
       if (priceAtTime.price > buyPoint.price) {
         const stocksToBuy = investAmount != null ? Math.floor(investAmount / buyPoint.price) : 1;
-        const currentProfit = new BigNumber(priceAtTime.price).minus(buyPoint.price).multipliedBy(stocksToBuy).toNumber();
+        const currentProfit = new BigNumber(priceAtTime.price).minus(buyPoint.price).multipliedBy(stocksToBuy).dp(2, BigNumber.ROUND_HALF_UP).toNumber();
         if (currentProfit > maxProfit.profit) {
           maxProfit = {
             buyTime: buyPoint.time,
             sellTime: priceAtTime.time,
             stocksToBuy: stocksToBuy,
             profit: currentProfit,
+            investAmount
           };
         }
       }

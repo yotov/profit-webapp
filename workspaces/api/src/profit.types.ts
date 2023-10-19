@@ -8,4 +8,5 @@ export type MaxProfit = {
   sellTime: Date;
   profit: number;
   stocksToBuy: number;
+  investAmount?: number | null;
 };

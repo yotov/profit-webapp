@@ -3,10 +3,12 @@ type RequestError = {
     fields?: Record<string, string>,
 }
 
+type RequestStateSuccess = { status: 'success', data: any };
+
 type RequestState =
     | { status: 'idle' }
     | { status: 'loading' }
-    | { status: 'success', data: any }
+    | RequestStateSuccess
     | { status: 'error', error: RequestError };
 
 type FormState = {
