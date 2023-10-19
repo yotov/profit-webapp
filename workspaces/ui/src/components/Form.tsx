@@ -32,14 +32,12 @@ const Form = () => {
 
         try {
             const params = new URLSearchParams(clean(formState));
-            const response = await fetch(`/api/profit?${params}`, {
+            const [response] = await Promise.all([fetch(`/api/profit?${params}`, {
                 method: 'GET',
                 headers: {
                     Accept: 'application/json',
                 },
-            });
-            // Simulate slow request to prevent blink of loader 
-            await new Promise(resolve => setTimeout(resolve, 350));
+            }), new Promise(resolve => setTimeout(resolve, 350))]);// Simulate slow request to prevent blink of loader  
 
             const result = await response.json();
             if (response.ok) {
