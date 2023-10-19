@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { isAfter, isBefore } from 'date-fns';
 import { MaxProfit, StockPrice } from './profit.types';
+import BigNumber from "bignumber.js";
 
 @Injectable()
 export class ProfitService {
@@ -35,7 +36,7 @@ export class ProfitService {
 
       if (priceAtTime.price > buyPoint.price) {
         const stocksToBuy = investAmount != null ? Math.floor(investAmount / buyPoint.price) : 1;
-        const currentProfit = (priceAtTime.price - buyPoint.price) * stocksToBuy;
+        const currentProfit = new BigNumber(priceAtTime.price).minus(buyPoint.price).multipliedBy(stocksToBuy).toNumber();
         if (currentProfit > maxProfit.profit) {
           maxProfit = {
             buyTime: buyPoint.time,

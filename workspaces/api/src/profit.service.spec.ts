@@ -27,15 +27,14 @@ describe('ProfitService', () => {
   ];
 
   const investAmountTestData: Array<StockPrice> = [
-    { price: 33.55, time: new Date(2020, 1, 2, 0, 13, 0) },
-    { price: 31.56, time: new Date(2020, 1, 2, 0, 13, 1) },
-    { price: 32.57, time: new Date(2020, 1, 2, 0, 13, 2) },
-    { price: 34.59, time: new Date(2020, 1, 2, 0, 13, 3) },
-    { price: 35.6, time: new Date(2020, 1, 2, 0, 13, 4) },
-    { price: 124.20, time: new Date(2020, 1, 2, 0, 13, 5) },
-    { price: 124.30, time: new Date(2020, 1, 2, 0, 13, 6) },
-    { price: 124.40, time: new Date(2020, 1, 2, 0, 13, 7) },
-    { price: 124.50, time: new Date(2020, 1, 2, 0, 13, 8) }
+    { price: 124.20, time: new Date(2020, 1, 2, 0, 13, 0) },
+    { price: 125.20, time: new Date(2020, 1, 2, 0, 13, 1) },
+    { price: 126.20, time: new Date(2020, 1, 2, 0, 13, 2) },
+    { price: 127.20, time: new Date(2020, 1, 2, 0, 13, 3) },
+    { price: 31.55, time: new Date(2020, 1, 2, 0, 13, 4) },
+    { price: 32.55, time: new Date(2020, 1, 2, 0, 13, 5) },
+    { price: 33.55, time: new Date(2020, 1, 2, 0, 13, 6) },
+    { price: 34.55, time: new Date(2020, 1, 2, 0, 13, 7) },
   ];
 
   const maxProfitTestCases = [
@@ -72,30 +71,29 @@ describe('ProfitService', () => {
     ],
   ];
 
-  
   const investAmountTestCases = [
     [
       'no invest amount',
       investAmountTestData[0].time,
-      investAmountTestData[8].time,
-      investAmountTestData[1],
-      investAmountTestData[8],
-      investAmountTestData[8].price - investAmountTestData[1].price,
+      investAmountTestData[7].time,
+      investAmountTestData[0],
+      investAmountTestData[3],
+      investAmountTestData[3].price - investAmountTestData[0].price,
       null,
-      ],
-      [
-        'with invest amount',
-        investAmountTestData[0].time,
-        investAmountTestData[8].time,
-        investAmountTestData[1],
-        investAmountTestData[8],
-        278.82,
-        124.23,
-      ],
+    ],
+    [
+      'with invest amount',
+      investAmountTestData[0].time,
+      investAmountTestData[7].time,
+      investAmountTestData[4],
+      investAmountTestData[7],
+      9,
+      124.20,
+    ],
     [
       'with invest amount which is not enought at all',
       investAmountTestData[0].time,
-      investAmountTestData[8].time,
+      investAmountTestData[7].time,
       null,
       null,
       0,
