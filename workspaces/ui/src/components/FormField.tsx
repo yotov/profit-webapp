@@ -4,7 +4,7 @@ const FormField = ({ id, label, requestState, optional, children }: FormFieldPro
     return <label className={'field ' + (requestState.status == "error" && requestState.error.fields?.hasOwnProperty(id) ? 'field-has-error' : '')}>
         <div className='field-label'>{label}{optional ? <span style={{fontSize: "10px", paddingLeft: "6px"}}>(optional)</span> : null}</div>
         {children}
-        {requestState.status == "error" && requestState.error.fields?.hasOwnProperty(id) && <div className="field-error">{requestState.error.fields[id]}</div>}
+        {requestState.status == "error" && requestState.error.fields?.hasOwnProperty(id) && <div className="field-error">{requestState.error.fields[id].replace(id, label)}</div>}
     </label>;
 }
 
