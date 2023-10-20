@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import DateTimePicker from 'react-datetime-picker';
 import Loader from '../components/Loader';
 import FormField from './FormField';
@@ -20,8 +20,21 @@ function parseNumber(value: string): number | undefined
 }
 
 const Form = () => {
+    const [range, setRange] = useState<TimeRange>({from: undefined, to: undefined});
     const [requestState, setRequestState] = useState<RequestState>({ status: 'idle' });
-    const [formState, setFormState] = useState<FormState>({ startTime: new Date(2023, 9, 19, 10, 58, 3).toISOString(), endTime: new Date(2023, 9, 19, 10, 58, 4).toISOString() });
+    const [formState, setFormState] = useState<FormState>({ startTime: undefined, endTime: undefined });
+
+    useEffect(() => {
+        const requestTimeRange = async () => {
+            const response = await fetch('/api/range');
+            const result = await response.json();
+            setRange({
+                from: new Date(result.from),
+                to: new Date(result.to),
+            });
+        };
+        requestTimeRange();
+    }, []);
 
     const handleSubmit = async (event: any) => {
         event.preventDefault();
@@ -54,10 +67,10 @@ const Form = () => {
     return <form className={"form " + (requestState.status === "loading" ? "form-loading" : "") + (requestState.status == "error" && !requestState.error.fields ? "form-has-error" : '')} onSubmit={handleSubmit}>
         {requestState.status == "error" && !requestState.error.fields && <div className="form-error">{requestState.error.message}</div>}
         <FormField id="startTime" label="Start date" requestState={requestState}>
-            <DateTimePicker autoFocus onChange={newValue => setFormState({ ...formState, startTime: newValue?.toISOString() })} format="y-MM-dd HH:mm:ss" value={formState.startTime} />
+            <DateTimePicker autoFocus onChange={newValue => setFormState({ ...formState, startTime: newValue?.toISOString() })} format="y-MM-dd HH:mm:ss" value={formState.startTime} minDate={range.from} maxDate={range.to} />
         </FormField>
         <FormField id="endTime" label="End date" requestState={requestState}>
-            <DateTimePicker onChange={newValue => setFormState({ ...formState, endTime: newValue?.toISOString() })} format="y-MM-dd HH:mm:ss" value={formState.endTime} />
+            <DateTimePicker onChange={newValue => setFormState({ ...formState, endTime: newValue?.toISOString() })} format="y-MM-dd HH:mm:ss" value={formState.endTime} minDate={range.from} maxDate={range.to} />
         </FormField>
         <FormField id="investAmount" label="Invest amount" requestState={requestState} optional>
             <input className="field-input" type="number" onChange={e => setFormState({ ...formState, investAmount: parseNumber(e.target.value) })} value={formState.investAmount ?? undefined} />

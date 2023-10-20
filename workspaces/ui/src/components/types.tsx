@@ -16,3 +16,8 @@ type FormState = {
     endTime: string | undefined,
     investAmount?: number | null
 }
+
+type TimeRange = {
+    from: Date | undefined,
+    to: Date | undefined,
+}

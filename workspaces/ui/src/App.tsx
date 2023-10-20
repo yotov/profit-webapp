@@ -2,12 +2,10 @@ import './App.css'
 import 'react-datetime-picker/dist/DateTimePicker.css';
 import 'react-calendar/dist/Calendar.css';
 import 'react-clock/dist/Clock.css';
-import { ErrorBoundary } from "react-error-boundary";
+import { ErrorBoundary } from 'react-error-boundary';
 import Form from './components/Form';
 
 function App() {
-
-
   return (
     <>
       <h1>Profit</h1>
