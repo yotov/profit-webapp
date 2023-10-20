@@ -1,5 +1,6 @@
 import { Command, CommandRunner, Option } from 'nest-commander';
-import { writeFile } from 'node:fs/promises';
+import { createWriteStream } from 'node:fs';
+import { stringify } from "csv-stringify";
 import { parse } from 'date-fns';
 
 interface CommandOptions {
@@ -33,14 +34,14 @@ export class PriceHistoryCommandModule extends CommandRunner {
     const count = options?.count ?? 10_000;
     let price = options?.startPrice ?? 100;
 
-    const content = [...Array(count).keys()]
-      .map((i) => {
-        price = round(price * getRandomPercentageChange(), 3);
-        return `${new Date(startTime + i * 1000).toISOString()},${price}`;
-      })
-      .join('\n');
-
-    await writeFile('./data/history.csv', content);
+    const stream = createWriteStream("./data/history.csv");
+    const stringifier = stringify({ header: false, columns: ["time", "price"] });
+    stringifier.pipe(stream);
+    for(let i = 0; i < count; i++)
+    {
+      price = round(price * getRandomPercentageChange(), 3);
+      stringifier.write({time: new Date(startTime + i * 1000).toISOString(), price});
+    }
   }
 
   @Option({
