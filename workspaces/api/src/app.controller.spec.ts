@@ -67,7 +67,7 @@ describe('AppController', () => {
       return request(app.getHttpServer())
         .get('/api/profit')
         .query({
-          startTime: new Date(2023, 9, 16, 23, 10).toISOString(),
+          startTime: new Date(2023, 9, 18, 23, 10).toISOString(),
           endTime: new Date(2024, 1, 1).toISOString(),
         })
         .expect(400)
@@ -83,8 +83,8 @@ describe('AppController', () => {
       return request(app.getHttpServer())
         .get('/api/profit')
         .query({
-          startTime: new Date(2023, 9, 16, 23, 9, 16, 0).toISOString(),
-          endTime: new Date(2023, 9, 16, 23, 9, 16, 1).toISOString(),
+          startTime: new Date(2023, 9, 18, 23, 9, 16, 0).toISOString(),
+          endTime: new Date(2023, 9, 18, 23, 9, 16, 1).toISOString(),
         })
         .expect(400)
         .expect(({ body }) => {
