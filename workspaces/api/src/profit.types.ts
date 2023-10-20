@@ -1,6 +1,6 @@
 export type StockPrice = {
   price: number;
-  time: Date;
+  time: number;
 };
 
 export type MaxProfit = {

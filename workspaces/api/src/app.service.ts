@@ -21,7 +21,7 @@ export class AppService {
       throw new InternalServerErrorException({ message: 'No data available' });
     }
 
-    if (startTime && isBefore(startTime, historicalData[0].time)) {
+    if (startTime && startTime.getTime() < historicalData[0].time) {
       throw new BadRequestException({
         message: 'startTime is outside available data range.',
         fields: {
@@ -36,7 +36,7 @@ export class AppService {
       });
     }
 
-    if (endTime && isAfter(endTime, historicalData.at(-1).time)) {
+    if (endTime && endTime.getTime() > historicalData.at(-1).time) {
       throw new BadRequestException({
         message: 'endTime is outside available data range.',
         fields: {

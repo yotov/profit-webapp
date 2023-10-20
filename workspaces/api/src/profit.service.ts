@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { isAfter, isBefore } from 'date-fns';
 import { MaxProfit, StockPrice } from './profit.types';
 import BigNumber from "bignumber.js";
 
@@ -14,12 +13,18 @@ export class ProfitService {
     let buyPoint: StockPrice = null;
     let maxProfit: MaxProfit = { buyTime: null, sellTime: null, profit: 0, stocksToBuy: 0 };
 
-    for (const priceAtTime of historicalPrices) {
-      if (isBefore(priceAtTime.time, start)) {
+    const startMs = performance.now();
+    const length = historicalPrices.length;
+    const startTime = start.getTime();
+    const endTime = end.getTime();
+    
+    for (let i = 0; i < length; i++) {
+      const priceAtTime = historicalPrices[i];
+      if (priceAtTime.time < startTime) {
         continue;
       }
 
-      if (isAfter(priceAtTime.time, end)) {
+      if (priceAtTime.time > endTime) {
         continue;
       }
 
@@ -39,8 +44,8 @@ export class ProfitService {
         const currentProfit = new BigNumber(priceAtTime.price).minus(buyPoint.price).multipliedBy(stocksToBuy).dp(2, BigNumber.ROUND_HALF_UP).toNumber();
         if (currentProfit > maxProfit.profit) {
           maxProfit = {
-            buyTime: buyPoint.time,
-            sellTime: priceAtTime.time,
+            buyTime: new Date(buyPoint.time),
+            sellTime: new Date(priceAtTime.time),
             stocksToBuy: stocksToBuy,
             profit: currentProfit,
             investAmount
@@ -48,6 +53,8 @@ export class ProfitService {
         }
       }
     }
+
+    console.log(performance.now() - startMs);
 
     return maxProfit;
   }

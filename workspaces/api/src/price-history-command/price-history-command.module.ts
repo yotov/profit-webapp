@@ -41,7 +41,7 @@ export class PriceHistoryCommandModule extends CommandRunner {
     for(let i = 0; i < count; i++)
     {
       price = getRandomNewPrice(price);
-      const res = stream.write(new Date(startTime + i * 1000).toISOString() + separator + price.toFixed(3) + newLine);
+      const res = stream.write((startTime + i * 1000) + separator + price.toFixed(3) + newLine);
       if(!res) {
         console.log('Waiting drain at: ', i);
         await new Promise(resolve => stream.once("drain", resolve));
