@@ -1,7 +1,7 @@
 import { Command, CommandRunner, Option } from 'nest-commander';
 import { createWriteStream } from 'node:fs';
-import { stringify } from "csv-stringify";
 import { parse } from 'date-fns';
+import BigNumber from "bignumber.js";
 
 interface CommandOptions {
   startTime?: Date;
@@ -9,19 +9,21 @@ interface CommandOptions {
   count?: number;
 }
 
-function round(value: number, precision = 2): number {
-  const res = Math.pow(10, precision);
-  return Math.round(value * res) / res;
+const separator = ",";
+const newLine = "\n";
+
+function getRandomNumber(rand, min, max) {
+  return rand * (max - min) + min;
 }
 
-function getRandomPercentageChange(): number {
+function getRandomNewPrice(price: BigNumber): BigNumber {
   const rand = Math.random();
-  if (rand < 0.3) {
-    return 1;
-  } else if (rand < 0.8) {
-    return 1 + rand / 1000;
+  if (rand < 0.1) {
+    return price;
+  } else if (rand < 0.7) {
+    return price.plus(getRandomNumber(rand, 0.001, 0.005));
   }
-  return 1 - rand / 1000;
+  return price.minus(getRandomNumber(rand, 0.002, 0.004));
 }
 
 @Command({
@@ -30,18 +32,23 @@ function getRandomPercentageChange(): number {
 })
 export class PriceHistoryCommandModule extends CommandRunner {
   async run(passedParam: string[], options?: CommandOptions): Promise<void> {
+    console.log(new Date());
     const startTime = (options?.startTime ?? new Date()).setMilliseconds(0);
     const count = options?.count ?? 10_000;
-    let price = options?.startPrice ?? 100;
+    let price = new BigNumber(options?.startPrice ?? 100);
 
-    const stream = createWriteStream("./data/history.csv");
-    const stringifier = stringify({ header: false, columns: ["time", "price"] });
-    stringifier.pipe(stream);
+    const stream = createWriteStream("./data/history.csv", {highWaterMark: 2 * 1024 * 1024});
     for(let i = 0; i < count; i++)
     {
-      price = round(price * getRandomPercentageChange(), 3);
-      stringifier.write({time: new Date(startTime + i * 1000).toISOString(), price});
+      price = getRandomNewPrice(price);
+      const res = stream.write(new Date(startTime + i * 1000).toISOString() + separator + price.toFixed(3) + newLine);
+      if(!res) {
+        console.log('Waiting drain at: ', i);
+        await new Promise(resolve => stream.once("drain", resolve));
+      }
     }
+    stream.end();
+    console.log(new Date());
   }
 
   @Option({
