@@ -10,3 +10,8 @@ export type MaxProfit = {
   stocksToBuy: number;
   investAmount?: number | null;
 };
+
+export type TimeRange = {
+  from: Date;
+  to: Date;
+};
