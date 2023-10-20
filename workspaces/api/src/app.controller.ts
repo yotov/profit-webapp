@@ -7,7 +7,7 @@ import { FindProfitDTO } from './dto/find-profit.dto';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get('/profit')
+  @Get('/api/profit')
   getMaxProfit(@Query() findProfit: FindProfitDTO): MaxProfit {
     return this.appService.getMaxProfit(findProfit.startTime, findProfit.endTime, findProfit.investAmount);
   }
