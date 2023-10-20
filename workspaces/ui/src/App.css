@@ -5,18 +5,19 @@
   text-align: center;
 }
 
+h1, h4 {
+  margin: 1rem;
+}
+
 .form {
   position: relative;
-  margin: 2rem;
+  margin: 0 2rem;
 
   & .form-error {
     color: red;
     font-size: 0.75rem;
     height: 1rem;
-    position: absolute; 
-    top: -1.5rem;
-    left: 0;
-    right: 0;
+    margin: 1rem;
   }
 }
 

@@ -3,21 +3,7 @@ import DateTimePicker from 'react-datetime-picker';
 import Loader from '../components/Loader';
 import FormField from './FormField';
 import Result from './Result';
-
-function clean(obj: any) {
-    for (const propName in obj) {
-        if (obj[propName] === null || obj[propName] === undefined) {
-            delete obj[propName];
-        }
-    }
-    return obj
-}
-
-function parseNumber(value: string): number | undefined
-{
-    const num = parseFloat(value);
-    return isNaN(num) ? undefined : num;
-}
+import { cleanNullInMap, formatDate, parseNumber } from '../utils';
 
 const Form = () => {
     const [range, setRange] = useState<TimeRange>({from: undefined, to: undefined});
@@ -44,7 +30,7 @@ const Form = () => {
         setRequestState({ status: 'loading' });
 
         try {
-            const params = new URLSearchParams(clean(formState));
+            const params = new URLSearchParams(cleanNullInMap(formState));
             const [response] = await Promise.all([fetch(`/api/profit?${params}`, {
                 method: 'GET',
                 headers: {
@@ -65,7 +51,8 @@ const Form = () => {
     };
 
     return <form className={"form " + (requestState.status === "loading" ? "form-loading" : "") + (requestState.status == "error" && !requestState.error.fields ? "form-has-error" : '')} onSubmit={handleSubmit}>
-        {requestState.status == "error" && !requestState.error.fields && <div className="form-error">{requestState.error.message}</div>}
+        {range.from && range.to && <h4>You can select time between {formatDate(range.from)} and {formatDate(range.to)}</h4>}
+        <div className="form-error">{requestState.status == "error" && !requestState.error.fields && requestState.error.message}</div>
         <FormField id="startTime" label="Start date" requestState={requestState}>
             <DateTimePicker autoFocus onChange={newValue => setFormState({ ...formState, startTime: newValue?.toISOString() })} format="y-MM-dd HH:mm:ss" value={formState.startTime} minDate={range.from} maxDate={range.to} />
         </FormField>
