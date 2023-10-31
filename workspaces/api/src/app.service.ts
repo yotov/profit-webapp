@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { MaxProfit } from './profit.types';
 import { ProfitService } from './profit.service';
-import { isAfter, isBefore } from 'date-fns';
 import { PriceRepository } from './price.repository';
 
 @Injectable()
@@ -16,12 +15,12 @@ export class AppService {
   ) {}
 
   getMaxProfit(startTime: Date, endTime: Date, investAmount?: number): MaxProfit {
-    const historicalData = this.priceRepository.getPrices();
-    if (historicalData.length == 0) {
+    const range = this.priceRepository.getRange();
+    if (!range.from || !range.to) {
       throw new InternalServerErrorException({ message: 'No data available' });
     }
 
-    if (startTime && startTime.getTime() < historicalData[0].time) {
+    if (startTime && startTime.getTime() < range.from.getTime()) {
       throw new BadRequestException({
         message: 'startTime is outside available data range.',
         fields: {
@@ -29,14 +28,14 @@ export class AppService {
         },
         context: {
           range: {
-            start: historicalData.at(0).time,
-            end: historicalData.at(-1).time,
+            start: range.from,
+            end: range.to,
           },
         },
       });
     }
 
-    if (endTime && endTime.getTime() > historicalData.at(-1).time) {
+    if (endTime && endTime.getTime() > range.to.getTime()) {
       throw new BadRequestException({
         message: 'endTime is outside available data range.',
         fields: {
@@ -44,15 +43,17 @@ export class AppService {
         },
         context: {
           range: {
-            start: historicalData.at(0).time,
-            end: historicalData.at(-1).time,
+            start: range.from,
+            end: range.to,
           },
         },
       });
     }
 
+    const historicalData = this.priceRepository.getPrices();
     const maxProfit = this.profitService.findOptimalResult(
       historicalData,
+      range,
       startTime,
       endTime,
       investAmount

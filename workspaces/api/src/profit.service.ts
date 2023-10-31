@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { MaxProfit, StockPrice } from './profit.types';
+import { MaxProfit, StockPrice, TimeRange } from './profit.types';
 import BigNumber from "bignumber.js";
 
 @Injectable()
 export class ProfitService {
   findOptimalResult(
-    historicalPrices: Array<StockPrice>,
+    historicalPrices: Array<number>,
+    range: TimeRange,
     start: Date,
     end: Date,
     investAmount?: number
@@ -14,38 +15,30 @@ export class ProfitService {
     let maxProfit: MaxProfit = { buyTime: null, sellTime: null, profit: 0, stocksToBuy: 0 };
 
     const startMs = performance.now();
-    const length = historicalPrices.length;
-    const startTime = start.getTime();
-    const endTime = end.getTime();
+    const startIndex = (start.getTime() - range.from.getTime()) / 1000;
+    const endIndex = (end.getTime() - range.from.getTime() ) / 1000;
     
-    for (let i = 0; i < length; i++) {
+    for (let i = startIndex; i <= endIndex; i++) {
       const priceAtTime = historicalPrices[i];
-      if (priceAtTime.time < startTime) {
-        continue;
-      }
-
-      if (priceAtTime.time > endTime) {
-        continue;
-      }
 
       if (buyPoint == null) {
-        if (investAmount == null || investAmount > priceAtTime.price) {
-          buyPoint = priceAtTime;
+        if (investAmount == null || investAmount > priceAtTime) {
+          buyPoint = { price: priceAtTime, time: range.from.getTime() + i * 1000 };
         }
         continue;
       }
 
-      if (priceAtTime.price < buyPoint.price) {
-        buyPoint = priceAtTime;
+      if (priceAtTime < buyPoint.price) {
+        buyPoint = { price: priceAtTime, time: range.from.getTime() + i * 1000 };
       }
 
-      if (priceAtTime.price > buyPoint.price) {
+      if (priceAtTime > buyPoint.price) {
         const stocksToBuy = investAmount != null ? Math.floor(investAmount / buyPoint.price) : 1;
-        const currentProfit = new BigNumber(priceAtTime.price).minus(buyPoint.price).multipliedBy(stocksToBuy).dp(2, BigNumber.ROUND_HALF_UP).toNumber();
+        const currentProfit = new BigNumber(priceAtTime).minus(buyPoint.price).multipliedBy(stocksToBuy).dp(2, BigNumber.ROUND_HALF_UP).toNumber();
         if (currentProfit > maxProfit.profit) {
           maxProfit = {
             buyTime: new Date(buyPoint.time),
-            sellTime: new Date(priceAtTime.time),
+            sellTime: new Date(range.from.getTime() + i * 1000),
             stocksToBuy: stocksToBuy,
             profit: currentProfit,
             investAmount

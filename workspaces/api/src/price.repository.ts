@@ -1,15 +1,15 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { StockPrice, TimeRange } from './profit.types';
+import { TimeRange } from './profit.types';
 import { createReadStream } from 'node:fs';
 import { parse } from 'csv-parse';
 
 @Injectable()
 export class PriceRepository implements OnModuleInit {
-  private historicalData: Array<StockPrice> = [];
+  private historicalData: Array<number> = [];
   private first: number = null;
   private last: number = null;
 
-  getPrices(): Array<StockPrice> {
+  getPrices(): Array<number> {
     return this.historicalData;
   }
 
@@ -32,7 +32,7 @@ export class PriceRepository implements OnModuleInit {
         if (this.last === null || time > this.last) {
           this.last = time;
         }
-        this.historicalData.push({ time, price: row[1] });
+        this.historicalData.push(row[1]);
       })
       .on('error', (err) => {
         console.error(err);
