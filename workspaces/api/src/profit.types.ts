@@ -15,3 +15,10 @@ export type TimeRange = {
   from: Date;
   to: Date;
 };
+
+export type HighLow = {
+  from: number,
+  to: number,
+  low: StockPrice,
+  high: StockPrice 
+}
