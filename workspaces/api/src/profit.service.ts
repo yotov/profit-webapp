@@ -9,6 +9,11 @@ export class ProfitService {
   findOptimalResult(start: Date, end: Date, investAmount?: number): MaxProfit {
     const historicalPrices = this.priceRepository.getPrices();
     const range = this.priceRepository.getRange();
+    const bucketsCount = Math.ceil(
+      (end.getTime() - start.getTime()) /
+        this.priceRepository.BATCH_NUMBER /
+        1000,
+    );
 
     let maxProfit: MaxProfit = {
       buyTime: null,
@@ -18,6 +23,17 @@ export class ProfitService {
       profit: 0,
       stocksToBuy: 0,
     };
+
+    if (bucketsCount < 2) {
+      return this.findMaxProfitInEdges(
+        historicalPrices,
+        range,
+        start,
+        end,
+        maxProfit,
+        investAmount,
+      );
+    }
 
     const firstStart = start;
     const firstEnd = new Date(

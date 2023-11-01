@@ -38,10 +38,14 @@ export class PriceRepository implements OnModuleInit {
   }
 
   async onModuleInit(): Promise<void> {
-    await this.loadData();
+    const stream = createReadStream('./data/history.csv').pipe(
+      parse({ delimiter: ',' }),
+    );
+    await this.loadData(stream);
   }
 
-  async loadData() {
+  async loadData(stream) {
+    this.reset();
     let index = 0;
     let agg = {
       from: null,
@@ -50,8 +54,7 @@ export class PriceRepository implements OnModuleInit {
       high: null,
     };
 
-    createReadStream('./data/history.csv')
-      .pipe(parse({ delimiter: ',' }))
+    stream
       .on('data', (row) => {
         const time = parseInt(row[0]);
         const price = parseFloat(row[1]);
@@ -90,5 +93,13 @@ export class PriceRepository implements OnModuleInit {
       .on('error', (err) => {
         console.error(err);
       });
+  }
+
+  reset() {
+    this.loaded = false;
+    this.historicalData = [];
+    this.historicalOneHourData = [];
+    this.first = null;
+    this.last = null;
   }
 }

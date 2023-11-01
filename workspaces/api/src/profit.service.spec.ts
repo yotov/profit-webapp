@@ -1,13 +1,23 @@
+import { Readable } from 'stream';
+import { PriceRepository } from './price.repository';
 import { ProfitService } from './profit.service';
-import { StockPrice, TimeRange } from './profit.types';
+import { StockPrice } from './profit.types';
 
-const createDate = (year, month, day, hours, minutes, seconds) => new Date(year, month, day, hours, minutes, seconds).getTime();
+const createDate = (year, month, day, hours, minutes, seconds) =>
+  new Date(year, month, day, hours, minutes, seconds).getTime();
 
-const getPrices = (historicalData: Array<StockPrice>): Array<number> => historicalData.map(h => h.price); 
-const getRange = (historicalData: Array<StockPrice>): TimeRange => ({from: new Date(historicalData[0].time), to: new Date(historicalData.at(-1).time)})
+const createReadableStream = (priceData: Array<StockPrice>) => {
+  return Readable.from(
+    priceData.map((point) => {
+      const { price, time } = point;
+      return [time, price];
+    }),
+  );
+};
 
 describe('ProfitService', () => {
-  const profitService = new ProfitService();
+  const priceRepository = new PriceRepository();
+  const profitService = new ProfitService(priceRepository);
 
   const profitTestData: Array<StockPrice> = [
     { price: 124.55, time: createDate(2020, 1, 2, 0, 13, 0) },
@@ -32,10 +42,10 @@ describe('ProfitService', () => {
   ];
 
   const investAmountTestData: Array<StockPrice> = [
-    { price: 124.20, time: createDate(2020, 1, 2, 0, 13, 0) },
-    { price: 125.20, time: createDate(2020, 1, 2, 0, 13, 1) },
-    { price: 126.20, time: createDate(2020, 1, 2, 0, 13, 2) },
-    { price: 127.20, time: createDate(2020, 1, 2, 0, 13, 3) },
+    { price: 124.2, time: createDate(2020, 1, 2, 0, 13, 0) },
+    { price: 125.2, time: createDate(2020, 1, 2, 0, 13, 1) },
+    { price: 126.2, time: createDate(2020, 1, 2, 0, 13, 2) },
+    { price: 127.2, time: createDate(2020, 1, 2, 0, 13, 3) },
     { price: 31.55, time: createDate(2020, 1, 2, 0, 13, 4) },
     { price: 32.55, time: createDate(2020, 1, 2, 0, 13, 5) },
     { price: 33.55, time: createDate(2020, 1, 2, 0, 13, 6) },
@@ -93,7 +103,7 @@ describe('ProfitService', () => {
       investAmountTestData[4],
       investAmountTestData[7],
       9,
-      124.20,
+      124.2,
     ],
     [
       'with invest amount which is not enought at all',
@@ -102,24 +112,23 @@ describe('ProfitService', () => {
       null,
       null,
       0,
-      15
+      15,
     ],
   ];
-
 
   describe('findOptimalResult', () => {
     it.each(maxProfitTestCases)(
       'returns largest profit - %s',
-      (
+      async (
         testCase,
         startTime: number,
         endTime: number,
         buyPoint: StockPrice,
-        sellPoint: StockPrice
+        sellPoint: StockPrice,
       ) => {
+        priceRepository.loadData(createReadableStream(profitTestData));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         const result = profitService.findOptimalResult(
-          getPrices(profitTestData),
-          getRange(noProfitTestData),
           new Date(startTime),
           new Date(endTime),
           null,
@@ -132,10 +141,10 @@ describe('ProfitService', () => {
 
     it.each(noProfitTestCases)(
       'returns null %s',
-      (testCase, startTime: number, endTime: number) => {
+      async (testCase, startTime: number, endTime: number) => {
+        priceRepository.loadData(createReadableStream(noProfitTestData));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         const result = profitService.findOptimalResult(
-          getPrices(noProfitTestData),
-          getRange(noProfitTestData),
           new Date(startTime),
           new Date(endTime),
           null,
@@ -149,26 +158,30 @@ describe('ProfitService', () => {
 
     it.each(investAmountTestCases)(
       'returns largest profit based on invest amount - %s',
-      (
+      async (
         testCase,
         startTime: number,
         endTime: number,
         buyPoint: StockPrice | null,
         sellPoint: StockPrice | null,
         maxProfit: number | null,
-        investAmount: number | null
+        investAmount: number | null,
       ) => {
+        priceRepository.loadData(createReadableStream(investAmountTestData));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         const result = profitService.findOptimalResult(
-          getPrices(investAmountTestData),
-          getRange(noProfitTestData),
           new Date(startTime),
           new Date(endTime),
           investAmount,
         );
 
         expect(result.profit).toBe(maxProfit);
-        expect(result.buyTime).toStrictEqual(buyPoint ? new Date(buyPoint.time) : null);
-        expect(result.sellTime).toStrictEqual(sellPoint ? new Date(sellPoint.time) : null);
+        expect(result.buyTime).toStrictEqual(
+          buyPoint ? new Date(buyPoint.time) : null,
+        );
+        expect(result.sellTime).toStrictEqual(
+          sellPoint ? new Date(sellPoint.time) : null,
+        );
       },
     );
   });
