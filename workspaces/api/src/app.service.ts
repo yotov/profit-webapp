@@ -14,49 +14,42 @@ export class AppService {
     private readonly profitService: ProfitService,
   ) {}
 
-  getMaxProfit(startTime: Date, endTime: Date, investAmount?: number): MaxProfit {
-    const range = this.priceRepository.getRange();
-    if (!range.from || !range.to) {
+  getMaxProfit(
+    startTime: Date,
+    endTime: Date,
+    investAmount?: number,
+  ): MaxProfit {
+    if (!this.priceRepository.isLoadComplete()) {
       throw new InternalServerErrorException({ message: 'No data available' });
     }
 
-    if (startTime && startTime.getTime() < range.from.getTime()) {
+    if (!this.priceRepository.isValidTime(startTime)) {
       throw new BadRequestException({
         message: 'startTime is outside available data range.',
         fields: {
           startTime: 'startTime is outside available data range.',
         },
         context: {
-          range: {
-            start: range.from,
-            end: range.to,
-          },
+          range: this.priceRepository.getRange(),
         },
       });
     }
 
-    if (endTime && endTime.getTime() > range.to.getTime()) {
+    if (!this.priceRepository.isValidTime(endTime)) {
       throw new BadRequestException({
         message: 'endTime is outside available data range.',
         fields: {
           endTime: 'endTime is outside available data range.',
         },
         context: {
-          range: {
-            start: range.from,
-            end: range.to,
-          },
+          range: this.priceRepository.getRange(),
         },
       });
     }
-
-    const historicalData = this.priceRepository.getPrices();
     const maxProfit = this.profitService.findOptimalResult(
-      historicalData,
-      range,
       startTime,
       endTime,
-      investAmount
+      investAmount,
     );
 
     if (maxProfit.profit == 0) {

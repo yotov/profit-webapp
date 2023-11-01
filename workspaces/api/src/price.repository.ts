@@ -5,11 +5,25 @@ import { parse } from 'csv-parse';
 
 @Injectable()
 export class PriceRepository implements OnModuleInit {
+  public BATCH_NUMBER: number = 3600;
+
   private historicalData: Array<number> = [];
   private historicalOneHourData: Array<HighLow> = [];
   private first: number = null;
   private last: number = null;
-  private BATCH_NUMBER: number = 3600;
+  private loaded: boolean = false;
+
+  isLoadComplete(): boolean {
+    return this.loaded;
+  }
+
+  isValidTime(time: Date): boolean {
+    return (
+      time != null &&
+      time.getTime() >= this.first &&
+      time.getTime() <= this.last
+    );
+  }
 
   getPrices(): Array<number> {
     return this.historicalData;
@@ -17,6 +31,10 @@ export class PriceRepository implements OnModuleInit {
 
   getRange(): TimeRange {
     return { from: new Date(this.first), to: new Date(this.last) };
+  }
+
+  getBatches(): Array<HighLow> {
+    return this.historicalOneHourData;
   }
 
   async onModuleInit(): Promise<void> {
@@ -29,7 +47,7 @@ export class PriceRepository implements OnModuleInit {
       from: null,
       to: null,
       low: null,
-      high: null
+      high: null,
     };
 
     createReadStream('./data/history.csv')
@@ -45,29 +63,29 @@ export class PriceRepository implements OnModuleInit {
         }
         this.historicalData.push(price);
 
-        if(agg.from == null)
-        {
+        if (agg.from == null) {
           agg.from = new Date(time);
         }
         agg.to = new Date(time);
-        if(agg.low == null || agg.low.price > price) {
+        if (agg.low == null || agg.low.price > price) {
           agg.low = { time: new Date(time), price: price };
         }
-        if(agg.high == null || agg.high.price < price) {
+        if (agg.high == null || agg.high.price < price) {
           agg.high = { time: new Date(time), price: price };
         }
-        if(++index % this.BATCH_NUMBER == 0) {
+        if (++index % this.BATCH_NUMBER == 0) {
           this.historicalOneHourData.push(agg);
           agg = {
             from: null,
             to: null,
             low: null,
-            high: null
+            high: null,
           };
         }
       })
       .on('close', () => {
         this.historicalOneHourData.push(agg);
+        this.loaded = true;
       })
       .on('error', (err) => {
         console.error(err);

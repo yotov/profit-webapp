@@ -4,6 +4,8 @@ export type StockPrice = {
 };
 
 export type MaxProfit = {
+  buyPrice: number;
+  sellPrice: number;
   buyTime: Date;
   sellTime: Date;
   profit: number;
@@ -17,8 +19,8 @@ export type TimeRange = {
 };
 
 export type HighLow = {
-  from: number,
-  to: number,
-  low: StockPrice,
-  high: StockPrice 
-}
+  from: number;
+  to: number;
+  low: StockPrice;
+  high: StockPrice;
+};
